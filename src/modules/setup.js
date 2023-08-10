@@ -22,18 +22,14 @@ const setupContainer = (ctx) => {
   ctx.container = $e(ctx.options.container);
 
   // Checks if container element exists
-  if (ctx.container instanceof $e || !ctx.container) {
+  if (!(ctx.container instanceof $e) || !ctx.container || !ctx.container.length) {
     return ctx.options.debug ? console.error('Error: Container not found') : false;
   }
 
-
-  if (ctx.container.length) {
-    ctx.container = ctx.container[0];
-  }
+  ctx.container = ctx.container[0]; // Always use the first element
 
   // Set container options selector to container element
   ctx.options.container = ctx.container;
-
   ctx.container.style.position = 'relative';
 };
 
@@ -53,17 +49,19 @@ const setupState = (ctx) => {
  * @param ctx {Object} - Macy instance
  */
 const setupEventListeners = (ctx) => {
-  let imgs = $e('img', ctx.container);
+  if (ctx.container) {
+    let imgs = $e('img', ctx.container);
+    window.addEventListener('resize', ctx.resizer);
+    ctx.on(ctx.constants.EVENT_IMAGE_LOAD, () => ctx.recalculate(false, false));
+    ctx.on(ctx.constants.EVENT_IMAGE_COMPLETE, () => ctx.recalculate(true, true));
 
-  window.addEventListener('resize', ctx.resizer);
-  ctx.on(ctx.constants.EVENT_IMAGE_LOAD, () => ctx.recalculate(false, false));
-  ctx.on(ctx.constants.EVENT_IMAGE_COMPLETE, () => ctx.recalculate(true, true));
-
-  if (!ctx.options.useOwnImageLoader) {
-    imagesLoadedNew(ctx, imgs, !ctx.options.waitForImages);
+    if (!ctx.options.useOwnImageLoader) {
+      imagesLoadedNew(ctx, imgs, !ctx.options.waitForImages);
+    }
+    ctx.emit(ctx.constants.EVENT_INITIALIZED);
   }
-
-  ctx.emit(ctx.constants.EVENT_INITIALIZED);
+  
+  return null
 };
 
 const setup = (ctx) => {

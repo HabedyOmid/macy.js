@@ -10,7 +10,6 @@ if (!Array.from) {
   Array.from=n=>{let i=0,a=[];for (;i<n.length;)a.push(n[i++]);return a;}
 }
 
-
 const defaults = {
   columns: 4,
   margin: 2,
@@ -97,14 +96,14 @@ Macy.prototype.recalculate = function (refresh = false, loaded = true) {
  * Destroys macy instance
  */
 Macy.prototype.remove = function () {
-  window.removeEventListener('resize', this.resizer);
+    window.removeEventListener('resize', this.resizer);
 
-  foreach(this.container.children, (child) => {
-    child.removeAttribute('data-macy-complete');
-    child.removeAttribute('style');
-  });
+    foreach(this.container.children, (child) => {
+      child.removeAttribute('data-macy-complete');
+      child.removeAttribute('style');
+    });
 
-  this.container.removeAttribute('style');
+    this.container.removeAttribute('style');
 };
 
 /**
@@ -114,9 +113,11 @@ Macy.prototype.reInit = function () {
   this.recalculate(true, true);
   this.emit(this.constants.EVENT_INITIALIZED);
   window.addEventListener('resize', this.resizer);
-  this.container.style.position = 'relative';
-};
 
+  if (this.container && this.container.nodeType === 1) { // Check if it's a valid DOM element
+    this.container.style.position = 'relative';
+  }
+}
 /**
  * Event listener for macy events
  * @param key {String} - Event name to listen to

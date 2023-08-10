@@ -38,9 +38,11 @@ const $e = function (parameter, context) {
  * @return {NodeList}
  */
 $e.prototype.byCss = function (parameter, context) {
-  return (context || document).querySelectorAll(parameter);
+  if (context && context.querySelectorAll) { // Check for context and its querySelectorAll method
+    return context.querySelectorAll(parameter);
+  }
+  return document.querySelectorAll(parameter);
 };
-
 
 $e.prototype.selectors = {};
 
