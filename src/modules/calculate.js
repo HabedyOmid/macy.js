@@ -10,34 +10,27 @@ import foreach from '../helpers/foreach';
  * @param  {Boolean} loaded  - Should all elements be marked as complete
  */
 const calculate = (ctx, refresh = false, loaded = true) => {
-  let children = [];
+  let children = refresh ? ctx.container.children : $e(':scope > *:not([data-macy-complete="1"])', ctx.container);
 
-  if (ctx.container) {
-    children = refresh
-      ? ctx.container.children
-      : $e(':scope > *:not([data-macy-complete="1"])', ctx.container);
+  // Filter out hidden children.
+  children = Array.from(children).filter(child => child.offsetParent !== null);
 
-    // Filter out hidden children.
-    children = Array.from(children).filter(child => child.offsetParent !== null);
+  let eleWidth = getWidths(ctx.options);
 
-    let eleWidth = getWidths(ctx.options);
-
-    foreach(children, (child) => {
-      if (refresh) {
-        child.dataset.macyComplete = 0;
-      }
-      child.style.width = eleWidth;
-    });
-  }
+  foreach(children, (child) => {
+    if (refresh) {
+      child.dataset.macyComplete = 0;
+    }
+    child.style.width = eleWidth;
+  });
 
   if (ctx.options.trueOrder) {
     cols.sort(ctx, children, refresh, loaded);
-    return ctx.emit(ctx.constants.EVENT_RECALCULATED);
+    return ctx.emit(ctx.constants.EVENT_RECALCULATED);//cols.sort(ctx, children, refresh, loaded);
   }
 
   cols.shuffle(ctx, children, refresh, loaded);
-  return ctx.emit(ctx.constants.EVENT_RECALCULATED);
+  return ctx.emit(ctx.constants.EVENT_RECALCULATED); //cols.shuffle(ctx, children, refresh, loaded);
 };
-
 
 export default calculate;
